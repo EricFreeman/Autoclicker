@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
+using VirtualInput;
 
 namespace AutoClicker
 {
@@ -13,11 +14,26 @@ namespace AutoClicker
         public const int MOUSEEVENTF_LEFTDOWN = 0x02;
         public const int MOUSEEVENTF_LEFTUP = 0x04;
 
-        private DispatcherTimer _dispatcherTimer = new DispatcherTimer();
+        private readonly DispatcherTimer _dispatcherTimer = new DispatcherTimer();
 
         public MainWindow()
         {
             InitializeComponent();
+
+            VirtualKeyboard.StartInterceptor();
+            VirtualKeyboard.KeyDown += VirtualKeyboardOnKeyDown;
+
+            _dispatcherTimer.Tick += dispatcherTimer_Tick;
+            _dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, 100);
+        }
+
+        private void VirtualKeyboardOnKeyDown(object sender, KeyEventArgs keyEventArgs)
+        {
+            if (keyEventArgs.KeyCode == Keys.F2)
+            {
+                if (!_dispatcherTimer.IsEnabled) _dispatcherTimer.Start();
+                else _dispatcherTimer.Stop();
+            }
         }
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
@@ -26,13 +42,6 @@ namespace AutoClicker
 
             mouse_event(MOUSEEVENTF_LEFTDOWN, (int)p.X, (int)p.Y, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, (int)p.X, (int)p.Y, 0, 0);
-        }
-
-        private void StartButton_OnClick(object sender, RoutedEventArgs e)
-        {
-            _dispatcherTimer.Tick += dispatcherTimer_Tick;
-            _dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
-            _dispatcherTimer.Start();
         }
 
         public static Point GetMousePositionWindowsForms()
