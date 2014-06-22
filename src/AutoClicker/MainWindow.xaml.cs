@@ -1,6 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
@@ -11,6 +9,8 @@ namespace AutoClicker
 {
     public partial class MainWindow
     {
+        #region Properties
+
         [DllImport("user32.dll")]
         public static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
 
@@ -29,6 +29,22 @@ namespace AutoClicker
             }
             set { MillisecondsEdit.Text = value.ToString(); }
         }
+        public Keys SelectedKey
+        {
+            get
+            {
+                Keys temp;
+                Enum.TryParse(SelectedKeyEdit.Text, out temp);
+                return temp;
+            }
+            set
+            {
+                var kc = new KeysConverter();
+                SelectedKeyEdit.Text = kc.ConvertToString(value);
+            }
+        }
+
+        #endregion
 
         #region Constructor
 
@@ -41,6 +57,7 @@ namespace AutoClicker
 
             _dispatcherTimer.Tick += dispatcherTimer_Tick;
             _milliseconds = 10;
+            SelectedKey = Keys.F2;
         }
 
         #endregion
@@ -49,7 +66,7 @@ namespace AutoClicker
 
         private void VirtualKeyboardOnKeyDown(object sender, KeyEventArgs keyEventArgs)
         {
-            if (keyEventArgs.KeyCode == Keys.F2)
+            if (keyEventArgs.KeyCode == SelectedKey)
             {
                 _dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, _milliseconds);
                 if (!_dispatcherTimer.IsEnabled) _dispatcherTimer.Start();
@@ -73,6 +90,15 @@ namespace AutoClicker
         {
             System.Drawing.Point point = Control.MousePosition;
             return new Point(point.X, point.Y);
+        }
+
+        #endregion
+
+        #region Setting SelectedKey
+
+        private void SelectedKeyEdit_OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            SelectedKey = (Keys)Enum.Parse(typeof(Keys), e.Key.ToString());
         }
 
         #endregion
