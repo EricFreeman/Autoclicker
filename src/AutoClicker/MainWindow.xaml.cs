@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
@@ -18,6 +19,8 @@ namespace AutoClicker
         public const int MOUSEEVENTF_LEFTUP = 0x04;
 
         private readonly DispatcherTimer _dispatcherTimer = new DispatcherTimer();
+
+        private NotifyIcon _ni = new NotifyIcon();
         
         private int _milliseconds
         {
@@ -46,11 +49,20 @@ namespace AutoClicker
 
         #endregion
 
-        #region Constructor
+        #region Window
 
         public MainWindow()
         {
             InitializeComponent();
+
+            _ni.Icon = new System.Drawing.Icon("Logo.ico");
+            _ni.Visible = true;
+            _ni.DoubleClick +=
+                delegate
+                {
+                    Show();
+                    WindowState = WindowState.Normal;
+                };
 
             VirtualKeyboard.StartInterceptor();
             VirtualKeyboard.KeyDown += VirtualKeyboardOnKeyDown;
@@ -58,6 +70,19 @@ namespace AutoClicker
             _dispatcherTimer.Tick += dispatcherTimer_Tick;
             _milliseconds = 10;
             SelectedKey = Keys.F2;
+        }
+
+        protected override void OnStateChanged(EventArgs e)
+        {
+            if (WindowState == WindowState.Minimized)
+                Hide();
+
+            base.OnStateChanged(e);
+        }
+
+        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
+        {
+            _ni.Visible = false;
         }
 
         #endregion
