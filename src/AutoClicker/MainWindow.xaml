@@ -1,25 +1,39 @@
 ﻿<Window x:Class="AutoClicker.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Eric's AutoClicker" Height="120" Width="425" 
-        ShowInTaskbar="False" Closing="MainWindow_OnClosing" Icon="Icon.ico">
+        Title="Eric's AutoClicker" Height="180" Width="300"
+        ResizeMode="CanMinimize" ShowInTaskbar="False" 
+        Closing="MainWindow_OnClosing" Icon="Icon.ico">
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition />
       <RowDefinition />
       <RowDefinition />
+      <RowDefinition />
+      <RowDefinition />
     </Grid.RowDefinitions>
     <Grid.ColumnDefinitions>
-      <ColumnDefinition />
-      <ColumnDefinition />
+      <ColumnDefinition Width="Auto" />
+      <ColumnDefinition Width="*" />
     </Grid.ColumnDefinitions>
 
     <Label>Press F2 to start/stop autoclicker</Label>
-    
-    <Label Grid.Row="1" Grid.Column="0">Milliseconds:</Label>
-    <TextBox Grid.Row="1" Grid.Column="1" Name="MillisecondsEdit" />
 
-    <Label Grid.Row="2" Grid.Column="0">Start/Stop Key:</Label>
-    <TextBox Grid.Row="2" Grid.Column="1" Name="SelectedKeyEdit" IsReadOnly="True" KeyDown="SelectedKeyEdit_OnKeyDown" />
+    <Label Grid.Row="1" Grid.Column="0">Seconds:</Label>
+    <TextBox Grid.Row="1" Grid.Column="1" Name="SecondsEdit" 
+             ToolTip="Seconds between clicks." />
+
+    <Label Grid.Row="2" Grid.Column="0">Milliseconds:</Label>
+    <TextBox Grid.Row="2" Grid.Column="1" Name="MillisecondsEdit" 
+             ToolTip="Milliseconds between clicks." />
+
+    <Label Grid.Row="3" Grid.Column="0">Random Delay:</Label>
+    <TextBox Grid.Row="3" Grid.Column="1" Name="RandomEdit" 
+             ToolTip="Delay from 0 to this value (in milliseconds) that will be chosen at random every interval between clicks." />
+
+    <Label Grid.Row="4" Grid.Column="0">Start/Stop Key:</Label>
+    <TextBox Grid.Row="4" Grid.Column="1" Name="SelectedKeyEdit" 
+             IsReadOnly="True" KeyDown="SelectedKeyEdit_OnKeyDown" 
+             ToolTip="Pressing this key will start and stop the autoclicker." />
   </Grid>
 </Window>

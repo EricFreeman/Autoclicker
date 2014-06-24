@@ -24,14 +24,22 @@ namespace AutoClicker
         
         private int _milliseconds
         {
-            get
-            {
-                int temp;
-                int.TryParse(MillisecondsEdit.Text, out temp);
-                return temp;
-            }
+            get { return GetInteger(MillisecondsEdit.Text); }
             set { MillisecondsEdit.Text = value.ToString(); }
         }
+
+        private int _seconds
+        {
+            get { return GetInteger(SecondsEdit.Text); }
+            set { SecondsEdit.Text = value.ToString(); }
+        }
+
+        private int _random
+        {
+            get { return GetInteger(RandomEdit.Text); }
+            set { RandomEdit.Text = value.ToString(); }
+        }
+
         public Keys SelectedKey
         {
             get
@@ -60,7 +68,9 @@ namespace AutoClicker
             VirtualKeyboard.KeyDown += VirtualKeyboardOnKeyDown;
 
             _dispatcherTimer.Tick += dispatcherTimer_Tick;
+            _seconds = 0;
             _milliseconds = 10;
+            _random = 0;
             SelectedKey = Keys.F2;
         }
 
@@ -113,7 +123,7 @@ namespace AutoClicker
         {
             if (keyEventArgs.KeyCode == SelectedKey)
             {
-                _dispatcherTimer.Interval = new TimeSpan(0, 0, 0, 0, _milliseconds);
+                SetInterval();
                 if (!_dispatcherTimer.IsEnabled) _dispatcherTimer.Start();
                 else _dispatcherTimer.Stop();
             }
@@ -125,8 +135,10 @@ namespace AutoClicker
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            var p = GetMousePositionWindowsForms();
+            if(_random > 0)
+                SetInterval();
 
+            var p = GetMousePositionWindowsForms();
             mouse_event(MOUSEEVENTF_LEFTDOWN, (int)p.X, (int)p.Y, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, (int)p.X, (int)p.Y, 0, 0);
         }
@@ -144,6 +156,23 @@ namespace AutoClicker
         private void SelectedKeyEdit_OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
             SelectedKey = (Keys)Enum.Parse(typeof(Keys), e.Key.ToString());
+        }
+
+        #endregion
+
+        #region Helper
+
+        public int GetInteger(string value)
+        {
+            int temp;
+            int.TryParse(value, out temp);
+            return temp;
+        }
+
+        public void SetInterval()
+        {
+            var r = new Random();
+            _dispatcherTimer.Interval = new TimeSpan(0, 0, 0, _seconds, _milliseconds + r.Next(0, _random));
         }
 
         #endregion
