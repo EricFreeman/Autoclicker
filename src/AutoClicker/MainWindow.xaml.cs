@@ -54,15 +54,7 @@ namespace AutoClicker
         public MainWindow()
         {
             InitializeComponent();
-
-            _ni.Icon = new System.Drawing.Icon("Logo.ico");
-            _ni.Visible = true;
-            _ni.DoubleClick +=
-                delegate
-                {
-                    Show();
-                    WindowState = WindowState.Normal;
-                };
+            InitializeNotifyIcon();
 
             VirtualKeyboard.StartInterceptor();
             VirtualKeyboard.KeyDown += VirtualKeyboardOnKeyDown;
@@ -74,6 +66,7 @@ namespace AutoClicker
 
         protected override void OnStateChanged(EventArgs e)
         {
+            _ni.Visible = WindowState == WindowState.Minimized;
             if (WindowState == WindowState.Minimized)
                 Hide();
 
@@ -83,6 +76,33 @@ namespace AutoClicker
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
             _ni.Visible = false;
+            _ni.Dispose();
+        }
+
+        #endregion
+
+        #region Notify Icon
+
+        private void InitializeNotifyIcon()
+        {
+            _ni.Icon = new System.Drawing.Icon("Logo.ico");
+            _ni.Visible = false;
+            _ni.DoubleClick +=
+                delegate
+                {
+                    Show();
+                    WindowState = WindowState.Normal;
+                };
+            _ni.Text = "Eric's AutoClicker";
+
+            var cm = new ContextMenu();
+            cm.MenuItems.Add(0, new MenuItem("Open", delegate
+            {
+                Show();
+                WindowState = WindowState.Normal;
+            }));
+            cm.MenuItems.Add(1, new MenuItem("Exit", (sender, args) => Close()));
+            _ni.ContextMenu = cm;
         }
 
         #endregion
