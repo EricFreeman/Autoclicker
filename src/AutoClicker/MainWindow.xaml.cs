@@ -155,7 +155,9 @@ namespace AutoClicker
 
         private void SelectedKeyEdit_OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            SelectedKey = (Keys)Enum.Parse(typeof(Keys), e.Key.ToString());
+            Keys temp;
+            Enum.TryParse(e.Key.ToString(), out temp);
+            SelectedKey = temp;
         }
 
         #endregion
