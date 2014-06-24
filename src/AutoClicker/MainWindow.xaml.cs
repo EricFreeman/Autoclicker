@@ -76,7 +76,6 @@ namespace AutoClicker
 
         protected override void OnStateChanged(EventArgs e)
         {
-            _ni.Visible = WindowState == WindowState.Minimized;
             if (WindowState == WindowState.Minimized)
                 Hide();
 
@@ -96,23 +95,21 @@ namespace AutoClicker
         private void InitializeNotifyIcon()
         {
             _ni.Icon = new System.Drawing.Icon("Logo.ico");
-            _ni.Visible = false;
-            _ni.DoubleClick +=
-                delegate
-                {
-                    Show();
-                    WindowState = WindowState.Normal;
-                };
+            _ni.Visible = true;
+            _ni.DoubleClick += delegate { OpenWindow(); };
             _ni.Text = "Eric's AutoClicker";
 
             var cm = new ContextMenu();
-            cm.MenuItems.Add(0, new MenuItem("Open", delegate
-            {
-                Show();
-                WindowState = WindowState.Normal;
-            }));
+            cm.MenuItems.Add(0, new MenuItem("Open", delegate { OpenWindow(); }));
             cm.MenuItems.Add(1, new MenuItem("Exit", (sender, args) => Close()));
             _ni.ContextMenu = cm;
+        }
+
+        private void OpenWindow()
+        {
+            Show();
+            WindowState = WindowState.Normal;
+            Focus();
         }
 
         #endregion
