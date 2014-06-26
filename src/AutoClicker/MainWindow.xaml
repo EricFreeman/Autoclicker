@@ -1,39 +1,58 @@
 ﻿<Window x:Class="AutoClicker.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Eric's AutoClicker" Height="180" Width="300"
+        Title="Eric's AutoClicker" Height="250" Width="300"
         ResizeMode="CanMinimize" ShowInTaskbar="False" 
         Closing="MainWindow_OnClosing" Icon="Icon.ico">
-  <Grid>
-    <Grid.RowDefinitions>
-      <RowDefinition />
-      <RowDefinition />
-      <RowDefinition />
-      <RowDefinition />
-      <RowDefinition />
-    </Grid.RowDefinitions>
-    <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="Auto" />
-      <ColumnDefinition Width="*" />
-    </Grid.ColumnDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
 
-    <Label>Press F2 to start/stop autoclicker</Label>
+        <Label Grid.Row="0">Press F2 to start/stop autoclicker</Label>
 
-    <Label Grid.Row="1" Grid.Column="0">Seconds:</Label>
-    <TextBox Grid.Row="1" Grid.Column="1" Name="SecondsEdit" 
+        <Label Grid.Row="1" Grid.Column="0">Seconds:</Label>
+        <TextBox Grid.Row="1" Grid.Column="1" Name="SecondsEdit" 
              ToolTip="Seconds between clicks." />
 
-    <Label Grid.Row="2" Grid.Column="0">Milliseconds:</Label>
-    <TextBox Grid.Row="2" Grid.Column="1" Name="MillisecondsEdit" 
+        <Label Grid.Row="2" Grid.Column="0">Milliseconds:</Label>
+        <TextBox Grid.Row="2" Grid.Column="1" Name="MillisecondsEdit" 
              ToolTip="Milliseconds between clicks." />
 
-    <Label Grid.Row="3" Grid.Column="0">Random Delay:</Label>
-    <TextBox Grid.Row="3" Grid.Column="1" Name="RandomEdit" 
+        <Label Grid.Row="3" Grid.Column="0">Random Delay:</Label>
+        <TextBox Grid.Row="3" Grid.Column="1" Name="RandomEdit" 
              ToolTip="Delay from 0 to this value (in milliseconds) that will be chosen at random every interval between clicks." />
 
-    <Label Grid.Row="4" Grid.Column="0">Start/Stop Key:</Label>
-    <TextBox Grid.Row="4" Grid.Column="1" Name="SelectedKeyEdit" 
+        <Label Grid.Row="4" Grid.Column="0">Start/Stop Key:</Label>
+        <TextBox Grid.Row="4" Grid.Column="1" Name="SelectedKeyEdit" 
              IsReadOnly="True" KeyDown="SelectedKeyEdit_OnKeyDown" 
              ToolTip="Pressing this key will start and stop the autoclicker." />
-  </Grid>
+
+        <Label Grid.Row="5" Grid.Column="0">Location:</Label>
+        <ComboBox Name="ClickPlacementEdit" Grid.Row="5" Grid.Column="1" SelectionChanged="ClickPlacementEdit_OnSelectionChanged"
+                  ToolTip="Where on the screen the simulated mouse click takes place.">
+            <ComboBoxItem Content="Mouse" />
+            <ComboBoxItem Content="Custom" />
+        </ComboBox>
+        
+        <WrapPanel Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2" Name="PlacementPanel">
+            <Label Content="X:" /><TextBox Name="XEdit" Width="50" />
+            <Label Content="Y:" /><TextBox Name="YEdit" Width="50" />
+            <Label Content="Set Position Hotkey:" />
+            <TextBox Name="SetCustomKeyEdit"
+             IsReadOnly="True" KeyDown="SetCustomKeyEdit_OnKeyDown" 
+             ToolTip="Pressing this key will set the custom location the autoclicker will click." />
+        </WrapPanel>    
+    </Grid>
 </Window>

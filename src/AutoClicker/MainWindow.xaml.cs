@@ -1,10 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Threading;
 using System.Runtime.InteropServices;
 using VirtualInput;
+using ContextMenu = System.Windows.Forms.ContextMenu;
+using Control = System.Windows.Forms.Control;
+using MenuItem = System.Windows.Forms.MenuItem;
 
 namespace AutoClicker
 {
@@ -13,7 +17,10 @@ namespace AutoClicker
         #region Properties
 
         [DllImport("user32.dll")]
-        public static extern void mouse_event(int dwFlags, int dx, int dy, int cButtons, int dwExtraInfo);
+        public static extern void mouse_event(int dwFlags, uint dx, uint dy, int cButtons, int dwExtraInfo);
+
+        [DllImport("user32.dll")]
+        public static extern void SetCursorPos(int X, int Y);
 
         public const int MOUSEEVENTF_LEFTDOWN = 0x02;
         public const int MOUSEEVENTF_LEFTUP = 0x04;
@@ -21,7 +28,7 @@ namespace AutoClicker
         private readonly DispatcherTimer _dispatcherTimer = new DispatcherTimer();
 
         private NotifyIcon _ni = new NotifyIcon();
-        
+
         private int _milliseconds
         {
             get { return GetInteger(MillisecondsEdit.Text); }
@@ -55,6 +62,48 @@ namespace AutoClicker
             }
         }
 
+        public ClickPlacement ClickPlacement
+        {
+            get
+            {
+                ClickPlacement temp;
+                Enum.TryParse(((ComboBoxItem)(ClickPlacementEdit.SelectedItem)).Content.ToString(), out temp);
+                return temp;
+            }
+
+            set
+            {
+                ClickPlacementEdit.Text = value.ToString();
+            }
+        }
+
+        public int ClickX
+        {
+            get { return GetInteger(XEdit.Text); }
+            set { XEdit.Text = value.ToString(); }
+        }
+
+        public int ClickY
+        {
+            get { return GetInteger(YEdit.Text); }
+            set { YEdit.Text = value.ToString(); }
+        }
+
+        public Keys SetCustomKey
+        {
+            get
+            {
+                Keys temp;
+                Enum.TryParse(SetCustomKeyEdit.Text, out temp);
+                return temp;
+            }
+            set
+            {
+                var kc = new KeysConverter();
+                SetCustomKeyEdit.Text = kc.ConvertToString(value);
+            }
+        }
+
         #endregion
 
         #region Window
@@ -72,6 +121,8 @@ namespace AutoClicker
             _milliseconds = 10;
             _random = 0;
             SelectedKey = Keys.F2;
+            SetCustomKey = Keys.F3;
+            ClickPlacement = ClickPlacement.Mouse;
         }
 
         protected override void OnStateChanged(EventArgs e)
@@ -124,6 +175,12 @@ namespace AutoClicker
                 if (!_dispatcherTimer.IsEnabled) _dispatcherTimer.Start();
                 else _dispatcherTimer.Stop();
             }
+            else if (keyEventArgs.KeyCode == SetCustomKey)
+            {
+                var pos = GetMousePositionWindowsForms();
+                ClickX = (int)pos.X;
+                ClickY = (int)pos.Y;
+            }
         }
 
         #endregion
@@ -132,12 +189,20 @@ namespace AutoClicker
 
         private void dispatcherTimer_Tick(object sender, EventArgs e)
         {
-            if(_random > 0)
+            if (_random > 0)
                 SetInterval();
 
+            int x, y;
+
             var p = GetMousePositionWindowsForms();
-            mouse_event(MOUSEEVENTF_LEFTDOWN, (int)p.X, (int)p.Y, 0, 0);
-            mouse_event(MOUSEEVENTF_LEFTUP, (int)p.X, (int)p.Y, 0, 0);
+            x = (int) p.X;
+            y = (int) p.Y;
+
+            if (ClickPlacement == ClickPlacement.Custom)
+                SetCursorPos(ClickX, ClickY);
+
+            mouse_event(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
+            SetCursorPos(x, y);
         }
 
         public static Point GetMousePositionWindowsForms()
@@ -172,6 +237,22 @@ namespace AutoClicker
         {
             var r = new Random();
             _dispatcherTimer.Interval = new TimeSpan(0, 0, 0, _seconds, _milliseconds + r.Next(0, _random));
+        }
+
+        #endregion
+
+        #region Click Placement
+
+        private void ClickPlacementEdit_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            PlacementPanel.IsEnabled = ClickPlacement == ClickPlacement.Custom;
+        }
+
+        private void SetCustomKeyEdit_OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            Keys temp;
+            Enum.TryParse(e.Key.ToString(), out temp);
+            SetCustomKey = temp;
         }
 
         #endregion
